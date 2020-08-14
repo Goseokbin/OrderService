@@ -51,7 +51,6 @@ public class OrderItem {
     }
 
     /**
-     *
      * 전체가격 조회
      */
 
