@@ -13,55 +13,56 @@ import java.util.List;
 
 import static javax.persistence.FetchType.*;
 
+
 @Entity
 @Table(name = "orders")
-@Getter @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED) //createOrder를 제외한 setter로 인한 변경을 방지
+@Getter
+@Setter
 public class Order {
     @Id
-    @GeneratedValue             //일종의 Auto_incresment
+    @GeneratedValue
     @Column(name = "order_id")
     private Long id;
 
-    @ManyToOne(fetch= LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
-    private Member member;
+    private Member member; //주문 회원
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems = new ArrayList<>();
 
-    @OneToOne(fetch =LAZY,cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "delivery_id")
-    private Delivery delivery;
-
-    private LocalDateTime orderDate;
+    private Delivery delivery; //배송정보
+    private LocalDateTime orderDate; //주문시간
 
     @Enumerated(EnumType.STRING)
-    private OrderStatus status;
-
+    private OrderStatus status; //주문상태 [ORDER, CANCEL]
 
     //==연관관계 메서드==//
-    public void setMember(Member member){
+    public void setMember(Member member) {
         this.member = member;
         member.getOrders().add(this);
     }
-    public void addOrderItem(OrderItem orderItem){
+
+    public void addOrderItem(OrderItem orderItem) {
         orderItems.add(orderItem);
         orderItem.setOrder(this);
     }
-    public void setDelivery(Delivery delivery){
-        this.delivery=delivery;
+
+    public void setDelivery(Delivery delivery) {
+        this.delivery = delivery;
         delivery.setOrder(this);
     }
 
     //==생성 메서드 ==//
 
-    public static Order createOrder(Member member,Delivery delivery, OrderItem... orderItems){
+    public static Order createOrder(Member member, Delivery delivery, OrderItem... orderItems) {
         Order order = new Order();
         order.setMember(member);
         order.setDelivery(delivery);
-        for (OrderItem orderitem : orderItems) {
-            order.orderItems.add(orderitem);
+        for (OrderItem orderItem : orderItems) {
+            order.addOrderItem(orderItem);
         }
         order.setStatus(OrderStatus.ORDER);
         order.setOrderDate(LocalDateTime.now());
@@ -69,23 +70,27 @@ public class Order {
     }
 
     //=====비즈니스로직====//
+
     /**
      * 주문 취소
      */
 
-    public void cancle(){
-        if(delivery.getStatus()==DeliveryStatus.COMP){
+    public void cancle() {
+        if (delivery.getStatus() == DeliveryStatus.COMP) {
             throw new IllegalStateException("이미 배송완료된 상품은 취소가 불가능합니다.");
         }
         this.status = OrderStatus.CANCEL;
-        for(OrderItem orderItem : orderItems) {
+        for (OrderItem orderItem : orderItems) {
             orderItem.cancle();
         }
     }
+
     /**
      * 조회 로직.
      */
-    public int getTotalprice(){
+    public int getTotalprice() {
         return orderItems.stream().mapToInt(OrderItem::getTotalPrice).sum();
     }
+
+
 }

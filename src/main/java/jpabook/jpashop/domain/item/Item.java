@@ -11,14 +11,17 @@ import java.util.List;
 @DiscriminatorColumn(name = "dtype")
 @Getter @Setter
 public abstract class Item {
+    public String getAuthor;
     @Id @GeneratedValue @Column(name = "item_id")
     private Long id;
+
     private String name;
     private int price;
     private int stockQuantity;
 
     @ManyToMany(mappedBy = "items")
     private List<Category> categories = new ArrayList<Category>();
+
 
     //==비즈니스 로직==//
     public void addStock(int quantity) {
