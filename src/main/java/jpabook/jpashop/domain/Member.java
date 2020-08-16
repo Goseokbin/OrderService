@@ -11,8 +11,8 @@ import java.util.List;
 @Getter@Setter
 public class Member{
     @Id @GeneratedValue
-    @Column(name = "member_id")         //db에 저장되는 이름
-   private Long id;
+    @Column(name = "member_id")
+    private Long id;
 
    private String name;
 
