@@ -1,14 +1,14 @@
 package jpabook.jpashop.api;
 
+import jpabook.jpashop.repository.order.simplequery.OrderSimpleQueryDto;
 import jpabook.jpashop.domain.Address;
 import jpabook.jpashop.domain.Order;
 import jpabook.jpashop.domain.OrderStatus;
 import jpabook.jpashop.repository.OrderRepository;
 import jpabook.jpashop.repository.OrderSearch;
-import jpabook.jpashop.service.OrderService;
+import jpabook.jpashop.repository.order.simplequery.OrderSimpleQueryRepository;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class OrderSimpleApiController {
     private final OrderRepository orderRepository;
+    private final OrderSimpleQueryRepository orderSimpleQueryRepository;
 
     /**
      * 아래와 같이 엔티티를 직접 넘길 경우 Order를 조회하면 Member로 가고 Member에서 다시 Order로 무한루프에 빠지게 된다.
@@ -60,6 +61,31 @@ public class OrderSimpleApiController {
 
     }
 
+    /**
+     *  fetch join 으로 한번의 쿼리문을 날려 조회(N+1 문제 해결)
+     */
+    @GetMapping("api/v3/simple-order")
+    public List<SimpleOrderDto> orderV3(){
+        List<Order> orders = orderRepository.findAllWithMemberDelivery();
+        List<SimpleOrderDto> result = orders.stream()
+                .map(s -> new SimpleOrderDto(s))
+                .collect(Collectors.toList());
+        return result;
+    }
+
+    /**
+     *
+     * v4 : DTO를 직접 조회 ->   V3의 쿼리보다 최적화 되어있다 (스펙에 맞게 원하는 것만 쿼리를 날린다)
+     * 그러나 최적화되는 성능이 미비하다.
+     * API 스펙에 맞춘 코드가 리포지토리에 들어가며 리포지토리의 재사용성이 떨어진다.
+     * 엔티로 조회하면 리포지토 재사용성도 좋고, 개발도 단순해진다.
+     */
+    @GetMapping("api/v4/simple-order")
+    public List<OrderSimpleQueryDto> orderV4(){
+        return orderSimpleQueryRepository.findOrderDto();
+
+    }
+
     @Data
     private class SimpleOrderDto {
         private Long orderId;
@@ -77,3 +103,10 @@ public class OrderSimpleApiController {
         }
     }
 }
+/**
+ * 쿼리 방식 선택 권장 순서
+ * 1.우선 엔티티를 DTO 변환하는 방법 선택.
+ * 2.필요시 페치 조인으로  성능을 최적화 한다 -> 대부분의 성능 이슈가 해결됨.
+ * 3. 그래도 안되면 DTO를 직접회하는 방법으 사용한다.
+ * 4. 최후의 방법으 JPA가 제공하는 네이티브 SQL이나 스프링 JDBC Template를 사용해 SQL을 직접 사용한다.
+ *  */
