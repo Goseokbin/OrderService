@@ -6,7 +6,6 @@ import jpabook.jpashop.service.MemberService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -25,7 +24,7 @@ public class MemberApiController {
      *
      * v1처럼 엔티티에서 직접 가져오면 엔티티를 전부 가져오기 때문 원치않은 정보도 가져온다(회원정보만 원하는데 주문정보도 가져온다)
      * JsonIgnore으로 부분해결할 수 있지만 다른 API를 개발할 때 문제가 생긴다.
-     * 또한 엔티티 presentation을 위한 로직이 생긴다. 분리가 안
+     * 또한 엔티티 presentation을 위한 로직이 생긴다. 분리가 안된다.
      * */
     @GetMapping("/api/v1/members")
     public List<Member> memberV1(){
