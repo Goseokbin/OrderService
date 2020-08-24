@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**XtoOne(OneToOne, ManyToOne)
+/**XtoOne(OneToOne, ManyToOne)에서의 API 설계
  * Order
  * Order->Member
  * Order->Delivery
@@ -78,7 +78,7 @@ public class OrderSimpleApiController {
      * v4 : DTO를 직접 조회 ->   V3의 쿼리보다 최적화 되어있다 (스펙에 맞게 원하는 것만 쿼리를 날린다)
      * 그러나 최적화되는 성능이 미비하다.
      * API 스펙에 맞춘 코드가 리포지토리에 들어가며 리포지토리의 재사용성이 떨어진다.
-     * 엔티로 조회하면 리포지토 재사용성도 좋고, 개발도 단순해진다.
+     * 엔티로 조티회하면 리포지토리 재사용성도 좋고, 개발도 단순해진다.
      */
     @GetMapping("api/v4/simple-order")
     public List<OrderSimpleQueryDto> orderV4(){

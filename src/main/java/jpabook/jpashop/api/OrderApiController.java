@@ -6,6 +6,8 @@ import jpabook.jpashop.domain.OrderItem;
 import jpabook.jpashop.domain.OrderStatus;
 import jpabook.jpashop.repository.OrderRepository;
 import jpabook.jpashop.repository.OrderSearch;
+import jpabook.jpashop.repository.order.query.OrderQueryDto;
+import jpabook.jpashop.repository.order.query.OrderQueryRepository;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +24,7 @@ import static java.util.stream.Collectors.toList;
 @RequiredArgsConstructor
 public class OrderApiController {
     private final OrderRepository orderRepository;
+    private final OrderQueryRepository orderQueryRepository;
 
     /**
      * v1 : 엔티티를 직접 노출하는 방법
@@ -73,7 +76,7 @@ public class OrderApiController {
      * v3-1은 v3에서 페이징이 불가능하는 단점을 보완한다.
      * ToOne의 관계는 페이징에 영향을 주지 않기 때문에 페치 조인으로 가져온다.
      * 이후 컬렉션 (1대다)의 경우 hibernate.default_batch_fetch_size (또는 @BatchSize)를 설정해 단점을 해결한다.
-     * 이 옵션을 사용하 컬렉션이나, 프록 객체 한꺼번에 설정 size 만큼 in 쿼리로 한번에 가져온다.
+     * 이 옵션을 사용하면 컬렉션이나, 프록시 객체 한꺼번에 설정 size 만큼 in 쿼리로 한번에 가져온다.
      * (OrderItemDTO 루프를 OrderId에 맞춰 In 쿼리로 한번만 날림)
      * 쿼리를 날리는 수는 v3보다 많으나 그 수가 많지않고 DB 데이터 전송량 감소한다.
      */
@@ -87,6 +90,31 @@ public class OrderApiController {
                 .map(order -> new OrderDto(order))
                 .collect(toList());
         return result;
+    }
+
+    /**
+     *
+     * v4 : JPA에서 DTO를 직접 조회한다.
+     * to One 관계는 조인을 통해 한번에 조회한 후 루프를 돌면서 컬렉션(1:N)관계를 추가한다.
+     * to One 관계는 조인해도 row 수가 증가하지 않는다.
+     * 컬렉션 관계는 조회하 row 수가 증가한다.
+     * 하지만 마찬가지로 1+N 문제가 발생한다.
+     */
+    @GetMapping("/api/v4/orders")
+    public List<OrderQueryDto> orderV4(){
+        List<OrderQueryDto> result = orderQueryRepository.findOrderQueryDtos();
+        return result;
+    }
+
+    /**
+     *
+     * v5 : v4에서 생기는 N+1 최적화.
+     * 번거로움이 있다.장점은 페치 조인보다 쿼리수는 적다.
+     * 데이터 한꺼번에 처리할 때 많이 사용하는 방식.
+     */
+    @GetMapping("api/v5/orders")
+    public List<OrderQueryDto> orderV5(){
+        return orderQueryRepository.findAllByDto_optimization();
     }
 
     @Data
