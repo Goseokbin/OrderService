@@ -1,10 +1,12 @@
 package jpabook.jpashop.repository;
 
 import jpabook.jpashop.domain.Member;
+import jpabook.jpashop.repository.member.LoginDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import java.util.List;
 
 @Repository                                 //Spring bean으로 등록 Component 스캔의 대상이 됨.
@@ -28,4 +30,11 @@ public class MemberRepository {
                 .setParameter("name", name).getResultList();
     }
 
+    public LoginDto LoginFindByName(String name) {
+        Member find = em.createQuery("select m from Member m" +
+                " where m.name= :name", Member.class)
+                .setParameter("name", name).getSingleResult();
+        LoginDto result = new LoginDto(find.getName(), find.getPass());
+        return result;
+    }
 }
