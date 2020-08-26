@@ -26,7 +26,7 @@ public class InitDb {
     static class InitService {
         private final EntityManager em;
         public void dbInit1() {
-            Member member = createMember("userA","123123","대전", "str1", "12313");
+            Member member = createMember("userAB","123123","서울", "str1", "12313");
             em.persist(member);
 
             Book book1 = createBook("Jpa1 Book",10000,100);

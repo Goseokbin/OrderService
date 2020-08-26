@@ -3,28 +3,33 @@ spring:
     admin:
       client:
         url: http://localhost:8081
-management:
-  endpoint:
-    web:
-      exposure:
-        include: "*"
+  management:
+    endpoint:
+      web:
+        exposure:
+          include: "*"
   datasource:
-    url:  jdbc:h2:tcp://localhost/~/jpashop
+    url: jdbc:h2:tcp://localhost/~/jpashop
     username: sa
     password:
     driver-class-name: org.h2.Driver
-
   jpa:
     hibernate:
-    ddl-auto: create;
+    ddl-auto: create
     properties:
       hibernate:
-#        show_sql: true
+        #        show_sql: true
         format_sql: true
         default_batch_fetch_size: 100
-
-
-
+  redis:
+    host: localhost
+    port: 6379
+  session:
+    timeout: 600
+    store-type: redis
+    redis:
+      flush-mode: on_save
+      namespace: spring:session
 
 logging:
   level:

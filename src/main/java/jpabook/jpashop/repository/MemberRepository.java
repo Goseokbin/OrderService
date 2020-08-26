@@ -34,7 +34,7 @@ public class MemberRepository {
         Member find = em.createQuery("select m from Member m" +
                 " where m.name= :name", Member.class)
                 .setParameter("name", name).getSingleResult();
-        LoginDto result = new LoginDto(find.getName(), find.getPass());
+        LoginDto result = new LoginDto(find.getId(),find.getName(), find.getPass());
         return result;
     }
 }
