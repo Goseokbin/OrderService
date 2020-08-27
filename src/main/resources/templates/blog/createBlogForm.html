@@ -7,24 +7,25 @@
 <body>
 <div class="container">
     <div th:replace="fragments/bodyHeader :: bodyHeader"/>
-    <form role="form" action="/members/new" th:object="${blogForm}" method="post">
+    <form role="form" action="/blog/new" th:object="${blogForm}" method="post">
         <div class="form-group">
             <label th:for="title">제목</label>
-            <input type="text" th:field="*{title}" class="form-control" placeholder="제목을 입력하세요"
-                   th:class="${#fields.hasErrors('title')}? 'form-control fieldError' : 'form-control'">
-            <p th:if="${#fields.hasErrors('title')}" th:errors="*{title}">Incorrect date</p>
+            <input type="text" th:field="*{title}" class="form-control" placeholder="제목을 입력하세요"/>
+<!--                   th:class="${#fields.hasErrors('title')}? 'form-control fieldError' : 'form-control'">-->
+<!--            <p th:if="${#fields.hasErrors('title')}" th:errors="*{title}">Incorrect date</p>-->
         </div>
         <div class="form-group">
             <label th:for="blogCategory">분류</label>
-            <select name = "blogCategory">
-<!--                <option th:each ="blogCategory: ${T(jpabook.jpashop.domain.BlogCategory).values()}"-->
+            <select name = "blogCategory" class="form-control">
+                <option value="">분류 선택</option>
+                <option th:each="blogCategory:${blogCategory}"
+                        th:value="${blogCategory}" th:text="${blogCategory}"/>
             </select>
-            <input type="text" th:field="*{blogCategory}" class="form-control" placeholder="분류">
         </div>
         <div class="form-group">
             <label th:for="street">작성자</label>
             <input type="text" th:field="*{memberName}" class="form-control"
-                   th:placeholder="${session.getAttribute("memberName")}"></div>
+                   th:placeholder="${session['userName']}"></div>
         <div class="form-group">
             <label th:for="street">날짜</label>
             <input type="text" th:field="*{localDateTime}" class="form-control"

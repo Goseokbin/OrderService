@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
 
 @Service
 @RequiredArgsConstructor

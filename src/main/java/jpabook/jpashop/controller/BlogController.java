@@ -1,6 +1,7 @@
 package jpabook.jpashop.controller;
 
 import jpabook.jpashop.domain.Blog;
+import jpabook.jpashop.domain.BlogCategory;
 import jpabook.jpashop.domain.BlogForm;
 import jpabook.jpashop.domain.Member;
 import jpabook.jpashop.service.BlogService;
@@ -21,22 +22,29 @@ public class BlogController {
     private final MemberService memberService;
 
 
-    @GetMapping("/blog/new")
+    @GetMapping(value="/blog/new")
     public String BlogForm(Model model) {
         model.addAttribute("blogForm", new BlogForm());
+        model.addAttribute("blogCategory", BlogCategory.values());
         return "blog/createBlogForm";
     }
-    @PostMapping("/blog/new")
+
+    @PostMapping(value="/blog/new")
     public String create(@Valid BlogForm form, BindingResult result){
-        if(result.hasErrors()){
-            return "blog/createBlogForm";
-        }
+//        if(result.hasErrors()){
+//            System.out.println("has-error");
+//            return "blog/createBlogForm";
+//        }
+
         Blog blog = new Blog();
         blog.setTittle(form.getTitle());
-        Member member = memberService.findOne(form.getMemberId());
+
+        Member member = memberService.findbyName(form.getMemberName());
         blog.setMember(member);
         blog.setLocalDateTime(form.getLocalDateTime());
         blog.setBlogCategory(form.getBlogCategory());
+        System.out.println("blogtitle : " + blog.getTittle());
+        System.out.println("blogLocalDate: "+ blog.getLocalDateTime());
 
         blogService.create(blog);
         return "redirect:/";
