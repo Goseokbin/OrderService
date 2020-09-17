@@ -3,17 +3,17 @@ package jpabook.jpashop.controller;
 import jpabook.jpashop.domain.Blog;
 import jpabook.jpashop.domain.BlogCategory;
 import jpabook.jpashop.domain.BlogForm;
-import jpabook.jpashop.domain.Member;
 import jpabook.jpashop.service.BlogService;
 import jpabook.jpashop.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -26,27 +26,35 @@ public class BlogController {
     public String BlogForm(Model model) {
         model.addAttribute("blogForm", new BlogForm());
         model.addAttribute("blogCategory", BlogCategory.values());
+        model.addAttribute("Datetime", LocalDateTime.now());
         return "blog/createBlogForm";
     }
 
     @PostMapping(value="/blog/new")
-    public String create(@Valid BlogForm form, BindingResult result){
-//        if(result.hasErrors()){
-//            System.out.println("has-error");
-//            return "blog/createBlogForm";
-//        }
-
-        Blog blog = new Blog();
-        blog.setTittle(form.getTitle());
-
-        Member member = memberService.findbyName(form.getMemberName());
-        blog.setMember(member);
-        blog.setLocalDateTime(form.getLocalDateTime());
-        blog.setBlogCategory(form.getBlogCategory());
-        System.out.println("blogtitle : " + blog.getTittle());
-        System.out.println("blogLocalDate: "+ blog.getLocalDateTime());
-
-        blogService.create(blog);
+    public String create(@Valid BlogForm form,HttpSession session){
+        Long userId =(Long)session.getAttribute("userId");
+        blogService.create(form,userId);
         return "redirect:/";
-}
+    }
+    @GetMapping(value="/blog")
+    public String list(Model model){
+        List<Blog> blogs = blogService.findAll();
+        model.addAttribute("blogs", blogs);
+        return "blog/blogList";
+    }
+
+    @GetMapping(value = "/blog/{blogId}/update")
+    public String update(@PathVariable Long blogId,Model model){
+        Blog blog = blogService.findbyId(blogId);
+        model.addAttribute("blog",blog);
+        model.addAttribute("blogId", blogId);
+        return "blog/updateBlogForm";
+    }
+    @PutMapping(value = "/blog/modify")
+    public String modify(@RequestBody BlogForm blogForm, @PathVariable Long blogId) {
+        blogService.update(blogId, blogForm.getTitle(), blogForm.getBlogCategory(), blogForm.getContent());
+        return "blog/blogList";
+    }
+
+
 }

@@ -1,5 +1,6 @@
 package jpabook.jpashop.domain;
 
+import jpabook.jpashop.domain.BlogCategory;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,6 +14,7 @@ public class BlogForm {
 
     private Long memberId;
     private String memberName;
+
     private LocalDateTime localDateTime;
     private BlogCategory blogCategory;
 

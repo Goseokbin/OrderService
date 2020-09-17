@@ -1,6 +1,7 @@
 package jpabook.jpashop;
 
 import jpabook.jpashop.domain.*;
+import jpabook.jpashop.domain.Blog;
 import jpabook.jpashop.domain.item.Book;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -8,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
-import javax.persistence.PostLoad;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -19,7 +20,9 @@ public class InitDb {
     public void init() {
         initService.dbInit1();
         initService.dbInit2();
+        initService.dbInit3();
     }
+
     @Component
     @Transactional
     @RequiredArgsConstructor
@@ -83,7 +86,26 @@ public class InitDb {
             book1.setStockQuantity(stockQuantity);
             return book1;
         }
+        public void dbInit3(){
+            List<Member> memberList = em.createQuery("select m from Member m").getResultList();
+            Blog blog1 = new Blog().builder()
+                    .member(memberList.get(0))
+                    .title("title1")
+                    .content("content1")
+                    .blogCategory(BlogCategory.Java)
+                    .build();
+            em.persist(blog1);
 
+            Blog blog2 = new Blog().builder()
+                    .member(memberList.get(1))
+                    .title("title2")
+                    .content("content2")
+                    .blogCategory(BlogCategory.Java)
+                    .build();
+            em.persist(blog2);
+
+
+        }
     }
 }
 

@@ -36,12 +36,12 @@ public class LoginController {
     public String login(@RequestParam("username") String username,
                         @RequestParam("pass") String pass, HttpSession session) {
 
-        LoginDto findMember = memberRepository.LoginFindByName(username);
-        loginSession = loginService.login(findMember,pass);
-        session.setAttribute("userId", loginSession.getMemberId());
-        session.setAttribute("userName", loginSession.getName());
+        LoginDto logindto = loginService.login(username, pass);
+        session.setAttribute("userId", logindto.getMemberId());
+        session.setAttribute("userName", logindto.getName());
 
         if(loginSession != null) return "redirect:/";
+
         else return "login/loginForm";
 
     }
