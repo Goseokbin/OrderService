@@ -50,10 +50,10 @@ public class BlogController {
         model.addAttribute("blogId", blogId);
         return "blog/updateBlogForm";
     }
-    @PutMapping(value = "/blog/modify")
-    public String modify(@RequestBody BlogForm blogForm, @PathVariable Long blogId) {
+    @PostMapping(value = "/blog/{blogId}/update" )
+    public String modify(@ModelAttribute("blog") BlogForm blogForm, @PathVariable Long blogId) {
         blogService.update(blogId, blogForm.getTitle(), blogForm.getBlogCategory(), blogForm.getContent());
-        return "blog/blogList";
+        return "redirect:/blog";
     }
 
 

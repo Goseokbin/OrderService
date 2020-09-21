@@ -22,7 +22,7 @@
                 <td th:text="${blog.content}"></td>
                 <td th:text="${blog.createTime}"></td>
                 <td>
-                    <a  th:href="'javascript:modify('+${blog.blogId}+')'"
+                    <a  th:href="@{/blog/{id}/update (id=${blog.blogId})}"
                        class="btn btn-danger">수정</a></td>
             </tr>
             </tbody>
